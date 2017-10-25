@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>Issue Tracker</h1>
+    <p class="lead">Issue Tracker is a simple ASP.NET web application to collect and track issues. Used technologies are: AngularJS, Bootstrap, JQuery and Razors.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Report an Issue</h2>
+        <div class="form-horizontal" ng-app="Issues">
+
+            <div ng-controller="IssueModalCtrl">
+                <modal lolo="modal1" modal-body="body" modal-footer="footer" modal-header="header" data-ng-click-right-button="myRightButton()"></modal>
+                <h5>
+                    <a href="#{{modal1}}" id="buttonNewIssue" role="button" class="btn btn-default" data-toggle="modal">Report an Issue!</a>
+                </h5>
+            </div>
+            <script type="text/ng-template" id="partialmodal.html">
+                <div id="{{handler}}" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h5 class="modal-title">{{header}}</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div id="loading-indicator" style="display:none" />
+
+                                <div id="formEditIssue">
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </script>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h2>Track Your Issue </h2>
+        <table>
+            <tr>
+                <td>
+                    <input type="text" id="TrackingNumber" class="form-control" placeholder="Tracking Number">
+                </td>
+                <td>
+                    <button class="btn btn-default" id="buttonSearch" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+    <div class="col-md-4">
+      
+    </div>
+</div>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/angular.min.js"></script>
+<script src="~/Scripts/ui-bootstrap-custom-tpls-2.5.0.min.js"></script>
+
+
+<script type="text/javascript">
+    angular.module('Issues', ['ui.bootstrap']);
+    angular.module('Issues').controller('IssueModalCtrl', function ($scope) { });
+
+    angular.module('Issues').directive('modal', function () {
+        return {
+            restrict: 'EA',
+            scope: {
+                header: '=modalHeader',
+                body: '=modalBody',
+                handler: '=lolo'
+            },
+            templateUrl: 'partialmodal.html',
+            transclude: true,
+            controller: function ($scope) {
+                $scope.handler = 'pop';
+            },
+        };
+    });
+
+    $("#buttonNewIssue").click(function () {
+        $(".modal-title").html("Report Issue");
+        $.ajax({
+            url: "/Issue/Create",
+            type: "Get",
+            success: function (response) {
+                $("#formEditIssue").empty().append(response);
+            },
+            error: function () {
+                alert("Sorry. The operation was not successful");
+            }
+        });
+    });
+
+
+    $("#buttonSearch").click(function () {
+        var xhr = new XMLHttpRequest();
+        var destURL = "/Issue/Details?TrackingNumber=" + $("#TrackingNumber").val();
+        window.location.assign(destURL);
+        xhr.open('GET', destURL, true);
+    });
+
+</script>
+

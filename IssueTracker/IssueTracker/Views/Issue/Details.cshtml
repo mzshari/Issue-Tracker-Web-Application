@@ -1,0 +1,75 @@
+﻿@model IssueTracker.Models.DomainModels.Issue
+
+<h2>Issue Details</h2>
+<hr />
+<div data-marker="@Json.Encode(Model.Id)"></div>
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.Id)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Id)
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.Title)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Title)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Description)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Description)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.DueDate)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.DueDate)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Severity.Title)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Severity.Title)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Status.Title)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Status.Title)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Technician.FirstName)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Technician.FirstName)
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.Comments)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Comments)
+    </dd>
+
+
+</dl>
+
+
+    <script>
+       
+    </script>

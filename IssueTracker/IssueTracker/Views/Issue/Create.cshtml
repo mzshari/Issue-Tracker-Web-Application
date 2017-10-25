@@ -1,0 +1,84 @@
+﻿@model IssueTracker.Models.DomainModels.Issue
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true)
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+
+                @Html.LabelFor(model => model.Title, new { @class = "form-label control-label" })
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                @Html.TextBoxFor(model => model.Title, new { id = "Title", @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Title)
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+
+                @Html.LabelFor(model => model.Description, new { @class = "form-label control-label" })
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                @Html.TextAreaFor(model => model.Description, new { id = "Description", @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+                <h5>
+                    @Html.LabelFor(model => model.Severity.Title, new { @class = "form-label control-label" })
+                </h5>
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                <select id="SeveritySelect" class="form-control">
+                    <option value="1">Critical</option>
+                    <option value="2">High</option>
+                    <option value="3">Medium</option>
+                    <option value="4">Low</option>
+                </select>
+            </div>
+        </div>
+        <br />
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+                
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                <input type="button" value="Create Issue" id="buttonCreateIssue" class="btn btn-default  btn-form" />
+                <input type="button" value="Cancel" data-dismiss="modal" class=" btn btn-default  btn-form" />
+            </div>
+        </div>
+    </div>
+
+
+}
+<script>
+    var xhr = new XMLHttpRequest();
+    $("#buttonCreateIssue").click(function () {
+        var Title = $("#Title").val();
+        var Description = $("#Description").val();
+        var token = $("input[name='__RequestVerificationToken']").val();
+        var SeverityId = document.getElementById("SeveritySelect").value;
+        var fd = new FormData();
+        fd.append("__RequestVerificationToken", token);
+        fd.append("Title", Title);
+        fd.append("Description", Description);
+        fd.append("SeverityId", SeverityId);
+        $(".loader").show();
+        xhr.open("POST", "/Issue/Create", true);
+        xhr.onreadystatechange = ClientSideUpdate;
+        xhr.send(fd);
+    });
+    function ClientSideUpdate() {
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200)
+                $("#formEditIssue").empty().append("<div class=\"alert alert-success\" id=\"myAlert\">Your reported issue is saved successfully. <br/> Your tacking number is:" + xhr.responseText + "</div>");
+            else
+                $("#formEditIssue").prepend("<div class=\"alert alert-danger\" id=\"myAlert\">Sorry. We couldn't save you issue. Please try again later.</div>");
+
+        }
+    }
+</script>

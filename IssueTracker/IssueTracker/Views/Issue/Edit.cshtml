@@ -1,0 +1,133 @@
+﻿@model IssueTracker.Models.DomainModels.Issue
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.Id)
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+
+                @Html.LabelFor(model => model.Title, new { @class = "form-label control-label" })
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                @Html.TextBoxFor(model => model.Title, new { id = "Title", @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Title)
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+
+                @Html.LabelFor(model => model.Description, new { @class = "form-label control-label" })
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                @Html.TextAreaFor(model => model.Description, new { id = "Description", @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+                <h5>
+                    @Html.LabelFor(model => model.Severity.Title, new { @class = "form-label control-label" })
+                </h5>
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                <select id="SeveritySelect" class="form-control">
+                    <option value="1">Critical</option>
+                    <option value="2">High</option>
+                    <option value="3">Medium</option>
+                    <option value="4">Low</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+                <h5>
+                    @Html.LabelFor(model => model.Status.Title, new { @class = "form-label control-label" })
+                </h5>
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                <select id="StatusSelect" class="form-control">
+                    <option value="1">New</option>
+                    <option value="2">InProgress</option>
+                    <option value="3">Resolved</option>
+                    <option value="4">Closed</option>
+                    <option value="5">Rejected</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+                @Html.LabelFor(model => model.Technician.FirstName, new { @class = "form-label control-label" })
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                @Html.DropDownList("TechnicianId", null, new { @id = "TechnicianId", @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.TechnicianId)
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+
+                @Html.LabelFor(model => model.Comments, new { @class = "form-label control-label" })
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                @Html.TextAreaFor(model => model.Comments, new { id = "Comments", @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Comments)
+            </div>
+        </div>
+
+        <br />
+        <div class="form-group row">
+            <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+            </div>
+            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-6">
+                <input type="button" value="Save" id="buttonSaveIssue" class="btn btn-default  btn-form" />
+                <input type="button" value="Cancel" data-dismiss="modal" class=" btn btn-default  btn-form" />
+            </div>
+        </div>
+    </div>
+
+
+}
+
+<script>
+
+    var xhr = new XMLHttpRequest();
+    $("#buttonSaveIssue").click(function () {
+        var Id = $("#Id").val();
+        var Title = $("#Title").val();
+        var Description = $("#Description").val();
+        var token = $("input[name='__RequestVerificationToken']").val();
+        var SeverityId = document.getElementById("SeveritySelect").value;
+        var StatusId = document.getElementById("StatusSelect").value;
+        var TechnicianId = $("#TechnicianId").val();;
+        var Comments = $("#Comments").val();;
+        var fd = new FormData();
+        fd.append("__RequestVerificationToken", token);
+        fd.append("Id", Id);
+        fd.append("Title", Title);
+        fd.append("Description", Description);
+        fd.append("SeverityId", SeverityId);
+        fd.append("StatusId", StatusId);
+        fd.append("TechnicianId", TechnicianId);
+        fd.append("Comments", Comments);
+        $(".loader").show();
+        xhr.open("POST", "/Issue/Edit", true);
+        xhr.onreadystatechange = ClientSideUpdate;
+        xhr.send(fd);
+    });
+    function ClientSideUpdate() {
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200)
+                window.location.reload();
+            else
+                alert("Sorry. An error has occured.");
+
+        }
+    }
+</script>

@@ -1,0 +1,235 @@
+﻿<section class="content">
+    <div ng-app="ListIssues">
+        <br />
+        <div ng-controller="IssuesCtrl">
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+
+                Search Phrase<br />
+                <input type="text" ng-model="searchst" id="SearchPhrase" class="form-control pull-right"><br>
+
+                Sorting Base
+                <form id="SortingForm" method="post">
+                    <select id="SortOrder" class="form-control select2-sorting">
+                        <option value="severity">Severity</option>
+                        <option value="dueDate">Due Date</option>
+                        <option value="title">Title</option>
+                    </select>
+                </form>
+
+                Status
+                <form id="StatusForm" method="post">
+                    <select id="Statuses" class="form-control">
+                        <option value=""></option>
+                        <option value="1">New</option>
+                        <option value="2">InProgress</option>
+                        <option value="3">Resolved</option>
+                        <option value="4">Closed</option>
+                        <option value="5">Rejected</option>
+                    </select>
+                </form>
+
+                Severity
+                <form id="SeverityForm" method="post">
+                    <select id="Severities" class="form-control">
+                        <option value=""></option>
+                        <option value="1">Critical</option>
+                        <option value="2">High</option>
+                        <option value="3">Medium</option>
+                        <option value="4">Low</option>
+                    </select>
+                </form>
+
+                <div>
+                    Due Date
+
+                    <div class="form-group">
+                        <div class='input-group date' id='DueDateFromPicker'>
+                            <input type='text' id='DueDateFrom' class="form-control" placeholder="From" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class='input-group date' id='DueDateToPicker'>
+                            <input type='text' id='DueDateTo' class="form-control" placeholder="To" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                <br />
+                <input type="submit" value="Search" id="buttonSearch" ng-click="Search()" class="btn btn-default  btn-block" />
+                <br />
+
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-8 col-lg-9">
+                <div style="min-height:600px; border-style:solid; border-width:thin; border-color:#DDDDDD; border-top:none">
+                    <br />
+                    <table class="table">
+                        <tr style="background-color:azure">
+                            <td>Title</td>
+                            <td>Severity</td>
+                            <td>Status</td>
+                            <td>Due Date</td>
+                        </tr>
+                        <tr class="not-a-link" ng-repeat="i in issues">
+
+                            <td>
+                                <a class="not-a-link" href="~/Issue/IssueDetails?id={{i.Id}}">
+                                    <div>
+                                        <span>{{i.Title}}</span>
+                                    </div>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="not-a-link" href="~/Issue/IssueDetails?id={{i.Id}}">
+                                    <div>
+                                        <span>{{i.Severity}}</span>
+                                    </div>
+                                </a>
+                            </td>
+
+                            <td>
+                                <a class="not-a-link" href="~/Issue/IssueDetails?id={{i.Id}}">
+                                    <div>
+                                        <span>{{i.Status}}</span>
+                                    </div>
+                                </a>
+                            </td>
+
+                            <td>
+                                <a class="not-a-link" href="~/Issue/IssueDetails?id={{i.Id}}">
+                                    <div>
+                                        <span>{{i.DueDate.slice(6, -2) | date:'dd/MM/yyyy'}}</span>
+                                    </div>
+                                </a>
+                            </td>
+                        </tr>
+
+                    </table>
+                    <h5>
+                        <span ng-if="totalItems == 0">
+                            There is no issues in your list.
+                        </span>
+                    </h5>
+                    <div ng-show="totalItems != 0">
+                        <table width="100%">
+                            <tr>
+                                <td>
+                                    <p style="text-align:left">
+                                        <uib-pagination style="vertical-align:bottom" total-items="totalItems" ng-model="currentPage" items-per-page="20" next-text="Next" previous-text="Prev" ng-change="pageChanged()"></uib-pagination>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+<script src="https://localhost:44399/Scripts/moment.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/angular.min.js"></script>
+<script src="https://localhost:44399/Scripts/bootstrap-datetimepicker.min.js"></script>
+<link href="https://localhost:44399/Content/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+<script type="text/javascript">
+    $('#DueDateFromPicker').datetimepicker({
+        format: 'DD/MM/YYYY'
+    });
+    $('#DueDateToPicker').datetimepicker({
+        format: 'DD/MM/YYYY'
+    });
+    $(document).ready(function () {
+
+    });
+
+    var PSMGroupId = null;
+    var StatusId = null;
+    var ProjectId = null;
+    var TenderId = null;
+    var SortOrder = $("#SortingForm").find('[name="Sorting"]').val();
+    var type = "";
+
+    var lastResponse;
+    var issues;
+    var totalItems;
+    var currentPage;
+
+    var xhr = new XMLHttpRequest();
+
+
+    angular.module('ListIssues', []);
+    angular.module('ListIssues').controller('IssuesCtrl', function ($scope, $http) {
+        this.myDate = new Date();
+        this.isOpen = false;
+        $scope.currentPage = 1;
+        $scope.sortOdrers = [
+            { name: 'Severity', value: 'severity' },
+            { name: 'Due Date', value: 'dueDate' },
+            { name: 'Title', value: 'title' }];
+        var actionUrl = "SelectIssues";
+        $http.get(actionUrl, {
+            params: {
+                SortOrder: "Severity", Page: 1, SeverityId: null, StatusId: null
+            }
+        }).success(function (response) {
+            $scope.lastResponse = response;
+            $scope.issues = response.IssuesList;
+            $scope.totalItems = response.TotalCount;
+
+        });
+
+
+
+        $scope.pageChanged = function () {
+            $http.get("SelectIssues", {
+                params: {
+                    SearchString: $scope.lastResponse.SearchString,
+                    SortOrder: $scope.lastResponse.SortOrder,
+                    Page: $scope.currentPage,
+                    DueDateFrom: $scope.lastResponse.StartDateFrom,
+                    DueDateTo: $scope.lastResponse.StartDateTo,
+                    SeverityId: $scope.lastResponse.SeverityId,
+                    StatusId: $scope.lastResponse.StatusId
+                }
+            })
+                .success((function (response) {
+                    $scope.lastResponse = response;
+                    $scope.issues = response.IssuesList;
+                    $scope.totalItems = response.TotalCount;
+
+                }));
+        };
+
+        $scope.Search = function () {
+            $http.get("SelectIssues", {
+                params: {
+                    SearchString: $scope.searchst,
+                    DueDateFrom: $("#DueDateFrom").val(),
+                    DueDateTo: $("#DueDateTo").val(),
+                    SeverityId: $("#Severities").val(),
+                    StatusId: $("#Statuses").val(),
+                    SortOrder: $("#SortOrder").val()
+                }
+            })
+                .success(function (response) {
+                    $scope.lastResponse = response;
+                    $scope.issues = response.IssuesList;
+                    $scope.totalItems = response.TotalCount;
+                }).error(function () { alert("Sorry. An error has occurd."); });
+        };
+    });
+
+
+
+</script>
